@@ -48,6 +48,17 @@ def create_strength_iteration_collection(command: Command) -> CommandCollection:
     return IterationGenerator(collection).generate_strength_steps_iteration()
 
 
+def create_input_image_collection(command: Command, src_dir: str) -> CommandCollection:
+    """Create a collection of input-image iterations"""
+
+    collection = CommandCollection(
+        output_directory=generate_output_dir(),
+        commands=[command],
+    )
+    return IterationGenerator(collection).generate_input_image_iteration(
+        src_dir, randomize_picks=True, randomize_seed=True
+    )
+
 def _main() -> None:
     collection = create_random_collection(10)
     # collection = create_inference_iteration_collection(

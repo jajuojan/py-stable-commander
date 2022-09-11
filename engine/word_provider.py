@@ -1,24 +1,39 @@
 """TBD"""
 import os
 from random import randint
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 
 class RandomWordProvider:
     """Random word provider."""
 
-    def __init__(self) -> None:
+    def __init__(self, source_directories: Optional[List[str]] = None) -> None:
+        if source_directories is None:
+            source_directories = ["~/ext_src/progrock-stable/settings/"]
+        self._source_directories = self._process_source_directories(source_directories)
         self._categories = self._read_words()
+
+    def _process_source_directories(self, source_directories: List[str]) -> List[str]:
+        new_dirs = []
+        for directory in source_directories:
+            new_dirs.append(os.path.abspath(os.path.expanduser(directory)))
+        print(new_dirs)
+        return new_dirs
 
     def _read_words(self) -> Dict[str, List[str]]:
         """Read random words from the file."""
+        # TODO: processing for non txt files
+        # TODO: support for recursing into subdirectories
+        # TODO: support for config (eg. flatten subdirs -> names)
         res = {}
-        base_dir = os.path.expanduser("~/ext_src/progrock-stable/settings/")
-        for filename in os.listdir(base_dir):
-            category = filename.split(".")[0]
-            with open(base_dir + filename, "r") as filename:
-                lines = filename.readlines()
-            res[category] = lines
+        for base_dir in self._source_directories:
+            for filename in os.listdir(base_dir):
+                full_filename = os.path.join(base_dir, filename)
+                if filename.endswith(".txt") and os.path.isfile(full_filename):
+                    category = filename.split(".")[0]
+                    with open(full_filename, "r") as filename:
+                        lines = filename.readlines()
+                    res[category] = lines
         return res
 
     def get_random_word(self, category: str) -> str:

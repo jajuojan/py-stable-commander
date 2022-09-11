@@ -1,7 +1,10 @@
 """TBD"""
+import os
+import random
 from typing import Callable, Optional, TypeVar
 
 from engine.command import Command, CommandCollection
+from engine.seed import get_random_seed
 
 T = TypeVar("T", int, float)
 
@@ -70,6 +73,41 @@ class IterationGenerator:
             return command
 
         return self._iterate_over_steps(_inc_guidance, start, stop, step)
+
+    def generate_input_image_iteration(
+        self,
+        source_directory: str,
+        amount_of_images: Optional[int] = None,
+        randomize_seed: bool = False,
+        randomize_picks: bool = False,
+    ) -> CommandCollection:
+        """Generate commands for an input image iteration."""
+        # TODO: unify some of these with word-fetcher
+        files = os.listdir(os.path.abspath(os.path.expanduser(source_directory)))
+        files = [
+            i for i in files if i.lower().endswith(".png") or i.lower().endswith(".jpg")
+        ]
+        files = [
+            os.path.abspath(os.path.expanduser(os.path.join(source_directory, i)))
+            for i in files
+        ]
+        if randomize_picks:
+            random.shuffle(files)
+        if amount_of_images is not None:
+            files = files[:amount_of_images]
+
+        new_collection = CommandCollection(
+            output_directory=self._collection.output_directory
+        )
+
+        for file_name in files:
+            new_command = self._base_command.clone()
+            new_command.init_image = file_name
+            if randomize_seed:
+                new_command.seed = get_random_seed()
+            new_collection.append(new_command)
+
+        return new_collection
 
 
 # TODO:

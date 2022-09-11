@@ -26,11 +26,13 @@ class BashShellExecutor:
                 else collection.file_name_for_command(command)
             )
 
+            # TODO: add quotes
             init_image = (
                 ""
                 if command.init_image is None
                 else f" --init-image {command.init_image}"
             )
+            # TODO: add quotes
             mask = "" if command.mask is None else f" --mask {command.mask}"
             strength = (
                 "" if command.strength is None else f" --strength {command.strength}"
