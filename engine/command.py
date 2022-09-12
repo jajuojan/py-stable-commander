@@ -7,6 +7,7 @@ from typing import List, Optional, Union
 from engine.seed import get_random_seed
 
 
+# pylint: disable=too-many-instance-attributes
 @dataclass
 class Command:
     """Command to be executed."""

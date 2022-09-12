@@ -4,6 +4,7 @@ from engine.command import CommandCollection
 from engine.seed import get_random_seed
 
 
+# pylint: disable=too-few-public-methods
 class BashShellExecutor:
     """Execute a command collection."""
 
