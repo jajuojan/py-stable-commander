@@ -1,0 +1,53 @@
+name: release-please
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run release-please
+        uses: GoogleCloudPlatform/release-please-action@v3.3.0
+        id: release_please
+        with:
+          release-type: python
+          package-name: py-stable-commander
+          pull-request-title-pattern: 'chore: release${component} ${version}'
+
+      - name: RELEASE - Checkout code
+        uses: actions/checkout@v3
+        if: ${{ steps.release_please.outputs.release_created }}
+
+      - name: RELEASE - Set-up Python env
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+          cache: 'poetry'
+        if: ${{ steps.release_please.outputs.release_created }}
+
+      - name: RELEASE - Restore dependencies
+        run: poetry install
+        if: ${{ steps.release_please.outputs.release_created }}
+
+      - name: RELEASE - Run tests
+        run: poetry run python -m unittest discover
+        if: ${{ steps.release_please.outputs.release_created }}
+
+      - name: Run PyCharm Security
+        uses: tonybaloney/pycharm-security@1.25.1
+        if: ${{ steps.release_please.outputs.release_created }}
+        
+      #- name: RELEASE - Upload release asset
+      #  id: upload-release-asset
+      #  uses: actions/upload-release-asset@v1
+      #  env:
+      #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #  with:
+      #    upload_url: ${{ steps.release_please.outputs.upload_url }}
+      #    asset_path: target/release/rs-license-formatter.exe
+      #    asset_name: rs-license-formatter.exe
+      #    asset_content_type: application/octet-stream
+      #  if: ${{ steps.release_please.outputs.release_created }}

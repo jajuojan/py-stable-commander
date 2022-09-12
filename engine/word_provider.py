@@ -16,8 +16,8 @@ class RandomWordProvider:
         base_dir = os.path.expanduser("~/ext_src/progrock-stable/settings/")
         for filename in os.listdir(base_dir):
             category = filename.split(".")[0]
-            with open(base_dir + filename, "r") as filename:
-                lines = filename.readlines()
+            with open(base_dir + filename, "r", encoding="utf-8") as handle:
+                lines = handle.readlines()
             res[category] = lines
         return res
 
